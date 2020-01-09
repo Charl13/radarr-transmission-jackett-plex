@@ -1,0 +1,77 @@
+version: "2"
+
+services:
+  transmission:
+    image: linuxserver/transmission
+    container_name: transmission
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TIME_ZONE}
+      - USER=${TRANSMISSION_USERNAME}
+      - PASS=${TRANSMISSION_PASSWORD}
+    volumes:
+      - transmission-config:/config
+      - downloads:/downloads
+    ports:
+      - "8081:9091"
+    restart: unless-stopped
+
+  radarr:
+    image: linuxserver/radarr
+    container_name: radarr
+    environment:
+      - PUID=${USER_ID}
+      - PGID=${GROUP_ID}
+      - TZ=${TIME_ZONE}
+    volumes:
+      - radarr-config:/config
+      - movies:/movies
+      - downloads:/downloads
+    ports:
+      - "8080:7878"
+    restart: unless-stopped
+
+  jackett:
+    image: linuxserver/jackett
+    container_name: jackett
+    environment:
+      - PUID=${USER_ID}
+      - PGID=${GROUP_ID}
+      - TZ=${TIME_ZONE}
+    volumes:
+      - jackett-config:/config
+      - downloads:/downloads
+    ports:
+      - "8082:9117"
+    restart: unless-stopped
+
+  plex:
+    image: linuxserver/plex
+    container_name: plex
+    environment:
+      - PUID=${USER_ID}
+      - PGID=${GROUP_ID}
+      - VERSION=docker
+      - UMASK_SET=022
+      - PLEX_CLAIM=claim-R99KGs8oDpm7zFZxmEiV
+    volumes:
+      - plex-config:/config
+      - series:/tv
+      - movies:/movies
+    ports:
+      - "32400:32400"
+      - "32400:32400/udp"
+      - "32469:32469"
+      - "32469:32469/udp"
+      - "1900:1900/udp"
+    restart: unless-stopped
+
+volumes:
+  transmission-config:
+  radarr-config:
+  jackett-config:
+  plex-config:
+  downloads:
+  movies:
+  series:
